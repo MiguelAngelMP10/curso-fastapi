@@ -56,32 +56,32 @@ def message():
     return HTMLResponse('<h1>Hello world</h1>')
 
 
-@app.get('/movies', tags=['movies'], response_model=List[Movie])
+@app.get('/movies', tags=['movies'], response_model=List[Movie], status_code=200)
 def get_movies() -> JSONResponse:
-    return JSONResponse(content=movies)
+    return JSONResponse(status_code=200, content=movies)
 
 
-@app.get('/movies/{id}', tags=['movies'], response_model=Movie)
+@app.get('/movies/{id}', tags=['movies'], response_model=Movie, status_code=200)
 def get_movie(id: int = Path(ge=1, le=2000)) -> JSONResponse:
     for item in movies:
         if item["id"] == id:
-            return JSONResponse(content=item)
-        return JSONResponse(content=[])
+            return JSONResponse(status_code=200, content=item)
+        return JSONResponse(status_code=404, content=[])
 
 
-@app.get('/movies/', tags=['movies'], response_model=Movie)
+@app.get('/movies/', tags=['movies'], response_model=Movie, status_code=200)
 def get_movies_by_category(category: str = Query(min_length=5, max_length=15)) -> JSONResponse:
     data = [item for item in movies if item['category'] == category]
-    return JSONResponse(content=data)
+    return JSONResponse(status_code=200, content=data)
 
 
-@app.post('/movies', tags=['movies'], response_model=dict)
+@app.post('/movies', tags=['movies'], response_model=dict, status_code=201)
 def create_movie(movie: Movie) -> JSONResponse:
     movies.append(movie.model_dump())
-    return JSONResponse(content={"message": "Se ha registrado la película"})
+    return JSONResponse(status_code=201, content={"message": "Se ha registrado la película"})
 
 
-@app.put('/movies/{id}', tags=['movies'], response_model=dict)
+@app.put('/movies/{id}', tags=['movies'], response_model=dict, status_code=200)
 def update_movie(id: int, movie: Movie) -> JSONResponse:
     for item in movies:
         if item["id"] == id:
@@ -90,12 +90,12 @@ def update_movie(id: int, movie: Movie) -> JSONResponse:
             item['year'] = movie.year
             item['rating'] = movie.rating
             item['category'] = movie.category
-            return JSONResponse(content={"message": "Se ha modificado la película"})
+            return JSONResponse(status_code=200, content={"message": "Se ha modificado la película"})
 
 
-@app.delete('/movies/{id}', tags=['movies'], response_model=dict)
+@app.delete('/movies/{id}', tags=['movies'], response_model=dict, status_code=200)
 def delete_movie(id: int) -> JSONResponse:
     for item in movies:
         if item["id"] == id:
             movies.remove(item)
-            return JSONResponse(content={"message": "Se ha eliminado la película"})
+            return JSONResponse(status_code=200, content={"message": "Se ha eliminado la película"})
