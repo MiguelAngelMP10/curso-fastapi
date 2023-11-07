@@ -7,10 +7,14 @@ from starlette.responses import JSONResponse
 
 from jwt_manager import create_token, validate_token
 from fastapi.security import HTTPBearer
+from config.database import Session, engine, Base
+from models.movie import Movie
 
 app = FastAPI()
 app.title = "Mi aplicación con  FastAPI"
 app.version = "0.0.1"
+
+Base.metadata.create_all(bind=engine)
 
 
 class JWTBearer(HTTPBearer):
@@ -35,7 +39,7 @@ class Movie(BaseModel):
     category: str = Field(min_length=5, max_length=15)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "id": 1,
                 "title": "Mi película",
