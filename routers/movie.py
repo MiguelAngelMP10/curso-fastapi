@@ -7,6 +7,7 @@ from config.database import Session
 from models.movie import Movie as MovieModel
 from fastapi.encoders import jsonable_encoder
 from middlewares.jwt_bearer import JWTBearer
+from services.movie import MovieService
 
 movie_router = APIRouter()
 
@@ -36,14 +37,14 @@ class Movie(BaseModel):
                   dependencies=[Depends(JWTBearer())])
 def get_movies() -> JSONResponse:
     db = Session()
-    result = db.query(MovieModel).all()
+    result = MovieService(db).get_movies()
     return JSONResponse(status_code=200, content=jsonable_encoder(result))
 
 
 @movie_router.get('/movies/{id}', tags=['movies'], response_model=Movie)
 def get_movie(id: int = Path(ge=1, le=2000)) -> JSONResponse:
     db = Session()
-    result = db.query(MovieModel).filter(MovieModel.id == id).first()
+    result = MovieService(db).get_movie(id)
     if not result:
         return JSONResponse(status_code=404, content={'message': "No encontrado"})
     return JSONResponse(status_code=200, content=jsonable_encoder(result))
